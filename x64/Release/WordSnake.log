@@ -1,0 +1,8 @@
+﻿  Dictionary.cpp
+  GameGrid.cpp
+  WordSnake.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 994 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  WordSnake.vcxproj -> C:\Users\Feast\source\repos\WordSnake\x64\Release\WordSnake.exe
