@@ -4,6 +4,7 @@
 #endif
 
 #include <wx/tglbtn.h>
+#include <wx/statline.h>
 
 #include <random>
 #include <list>
@@ -45,13 +46,22 @@ private:
 		8
 	};
 	int mAlphabetScores[mAlphabetCeil];
+
+	int mCurrentScore = 0;
+
 	std::default_random_engine* mRandomEngine;
 	std::discrete_distribution<int>* mRandomDistribution;
 	wxChar randomLetter() const;
+
 	std::list<std::pair<int, int> > mCurrentSelection;
 	static bool isAdjacent(int, int, int, int);
 	static std::pair<int, int> getCoordinates();
+	void replaceCurrentSelection();
 	wxString getSelectedString() const;
+	void clearCurrentSelection();
+
 	int getWordScore(wxString);
 	Dictionary mDictionary;
+
+	wxStaticText* mScorePreview;
 };

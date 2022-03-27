@@ -7,6 +7,7 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 	//on the distribution of words in the language
 	mRandomEngine = new std::default_random_engine(std::random_device{}());
 
+	//setup for the alphabet and the generation of random letters
 	std::vector<int> mAlphabetDistributionVector;
 	std::copy(
 		std::begin(mAlphabetDistribution),
@@ -17,8 +18,11 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 		mAlphabetDistributionVector.begin(), mAlphabetDistributionVector.end()
 	};
 
+	//go ahead and load up the dictionary from the file specified
 	mDictionary.initialize();
 
+	//currently the score of each letter is the inverse of how common it is
+	// TODO: change how scores are calculated, increases for longer words, normalize a little so that for example, z isn't worth 1000x an e
 	for (int i = 0; i < mAlphabetCeil; i++) {
 		mAlphabetScores[i] = 
 			static_cast<int>(
@@ -27,6 +31,7 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 
 	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
 
+	// TODO: tidy all this garbage up, maybe subclass, or create a factory for button classes
 	wxFlexGridSizer* flexGrid = new wxFlexGridSizer(0, 1, 0, 0);
 	flexGrid->SetFlexibleDirection(wxBOTH);
 	flexGrid->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
@@ -60,6 +65,7 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 
 	flexGrid->Add(grid, 1, wxEXPAND, 5);
 
+	//all this holds the Ok and Cancel buttons
 	wxStdDialogButtonSizer* sdbSizer = new wxStdDialogButtonSizer();
 	sdbSizer->AddButton(new wxButton(this, wxID_OK));
 	sdbSizer->GetAffirmativeButton()->Bind(wxEVT_BUTTON, &GameGrid::OnOkButtonClicked, this);
@@ -70,8 +76,26 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 
 	flexGrid->Add(sdbSizer, 1, wxALIGN_CENTER, 5);
 
+	//wxStaticLine* wxStaticLine1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
+	//flexGrid->Add(wxStaticLine1, 0, wxEXPAND | wxALL, 5);
+
+	wxBoxSizer* scorePreviewBoxSizer;
+	scorePreviewBoxSizer = new wxBoxSizer(wxVERTICAL);
+
+	mScorePreview = new wxStaticText(this, wxID_ANY, wxT("MyLabel"), wxDefaultPosition, wxDefaultSize, 0);
+	mScorePreview->Wrap(-1);
+	mScorePreview->SetLabel("Currently selected word score");
+	scorePreviewBoxSizer->Add(mScorePreview, 0, wxALL | wxALIGN_CENTER, 5);
+	scorePreviewBoxSizer->Layout();
+
+	flexGrid->Add(scorePreviewBoxSizer, 1, wxALIGN_CENTER_HORIZONTAL | wxEXPAND | wxFIXED_MINSIZE, 5);
+
+	//wxStaticLine* wxStaticLine2 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
+	//flexGrid->Add(wxStaticLine2, 0, wxEXPAND | wxALL, 5);
+
 	//add the sizer to the frame and set it to lay itself out
 	this->SetSizer(flexGrid);
+	//slight fix to resize the grid properly as the window opens
 	this->SetSize(flexGrid->GetMinSize());
 	this->Layout();
 }
@@ -127,17 +151,23 @@ void GameGrid::OnButtonClicked(wxCommandEvent& evt) {
 }
 
 void GameGrid::OnOkButtonClicked(wxCommandEvent& evt) {
+	bool isWord = mDictionary.isWord(getSelectedString());
+	int wordScore = getWordScore(getSelectedString());
 	wxLogDebug("ok button pressed");
 	wxLogDebug(getSelectedString());
-	wxLogDebug("%s", mDictionary.isWord(getSelectedString()) ? " is a word" : " is not a word");
-	wxLogDebug("word score %i", getWordScore(getSelectedString()));
+	wxLogDebug("%s", isWord ? " is a word" : " is not a word");
+	wxLogDebug("word score %i", wordScore);
+	if (isWord) {
+		replaceCurrentSelection();
+		clearCurrentSelection();
+		mCurrentScore += wordScore;
+		wxLogDebug("current score now %i", mCurrentScore);
+	}
 }
 
 void GameGrid::OnCancelButtonClicked(wxCommandEvent& evt) {
 	wxLogDebug("cancel button pressed");
-	for (auto i : mCurrentSelection)
-		mButtons[i.second * GRID_WIDTH + i.first]->SetValue(false);
-	mCurrentSelection.clear();
+	clearCurrentSelection();
 }
 
 wxChar GameGrid::randomLetter() const {
@@ -157,11 +187,25 @@ bool GameGrid::isAdjacent(int x1, int y1, int x2, int y2) {
 	return false;
 }
 
+void GameGrid::replaceCurrentSelection() {
+	for (auto i : mCurrentSelection) {
+		wxChar newChar = randomLetter();
+		mValues[i.second * GRID_WIDTH + i.first] = newChar;
+		mButtons[i.second * GRID_WIDTH + i.first]->SetLabel(newChar);
+	}
+}
+
 wxString GameGrid::getSelectedString() const {
 	wxString str;
 	for (auto i : mCurrentSelection)
 		str.Append(mValues[i.second * GRID_WIDTH + i.first]);
 	return str;
+}
+
+void GameGrid::clearCurrentSelection() {
+	for (auto i : mCurrentSelection)
+		mButtons[i.second * GRID_WIDTH + i.first]->SetValue(false);
+	mCurrentSelection.clear();
 }
 
 int GameGrid::getWordScore(wxString str) {

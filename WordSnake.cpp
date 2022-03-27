@@ -9,9 +9,15 @@ public:
 
 wxIMPLEMENT_APP(WordSnake);
 bool WordSnake::OnInit() {
-    wxLog::SetLogLevel(wxLOG_Debug);
+
     wxLog::EnableLogging();
+
+#ifdef _DEBUG
+    wxLog::SetLogLevel(wxLOG_Debug);
     wxLog::SetActiveTarget(new wxLogWindow(nullptr, "Logging"));
+#else
+    wxLog::SetLogLevel(wxLOG_Error);
+#endif // DEBUG
 
     mGameGrid = new GameGrid();
     mGameGrid->Show();
