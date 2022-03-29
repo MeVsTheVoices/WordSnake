@@ -10,6 +10,7 @@
 #include <list>
 
 #include "Dictionary.hpp"
+#include "ToggleButtonGrid.hpp"
 
 class GameGrid : public wxFrame {
 public:
@@ -64,4 +65,6 @@ private:
 	Dictionary mDictionary;
 
 	wxStaticText* mScorePreview;
+
+	ToggleButtonGrid* mToggleButtonGrid;
 };

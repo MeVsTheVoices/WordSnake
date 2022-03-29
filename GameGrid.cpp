@@ -36,7 +36,7 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 	flexGrid->SetFlexibleDirection(wxBOTH);
 	flexGrid->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	//create as many buttons as are needed to populate the grid
+	/*//create as many buttons as are needed to populate the grid
 	mButtons = new wxToggleButton * [GRID_HEIGHT * GRID_WIDTH];
 	mValues = new wxChar[GRID_HEIGHT * GRID_WIDTH];
 
@@ -61,9 +61,12 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 
 			mButtons[(i * GRID_WIDTH) + j]->SetLabel(mValues[(i * GRID_WIDTH) + j]);
 		}
-	}
+	}*/
 
-	flexGrid->Add(grid, 1, wxEXPAND, 5);
+	wxFont gridButtonFont(30, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+	mToggleButtonGrid = new ToggleButtonGrid(this, 10, 10, gridButtonFont);
+
+	flexGrid->Add(mToggleButtonGrid, 1, wxEXPAND, 5);
 
 	//all this holds the Ok and Cancel buttons
 	wxStdDialogButtonSizer* sdbSizer = new wxStdDialogButtonSizer();
@@ -76,27 +79,22 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 
 	flexGrid->Add(sdbSizer, 1, wxALIGN_CENTER, 5);
 
-	//wxStaticLine* wxStaticLine1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-	//flexGrid->Add(wxStaticLine1, 0, wxEXPAND | wxALL, 5);
-
 	wxBoxSizer* scorePreviewBoxSizer;
 	scorePreviewBoxSizer = new wxBoxSizer(wxVERTICAL);
 
-	mScorePreview = new wxStaticText(this, wxID_ANY, wxT("MyLabel"), wxDefaultPosition, wxDefaultSize, 0);
+	mScorePreview = new wxStaticText(this, wxID_ANY, wxT("static_text_score_preview"), wxDefaultPosition, wxDefaultSize, 0);
 	mScorePreview->Wrap(-1);
+	
+	wxFont scorePreviewFont(15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	mScorePreview->SetLabel("Currently selected word score");
+	mScorePreview->SetFont(scorePreviewFont);
 	scorePreviewBoxSizer->Add(mScorePreview, 0, wxALL | wxALIGN_CENTER, 5);
 	scorePreviewBoxSizer->Layout();
 
 	flexGrid->Add(scorePreviewBoxSizer, 1, wxALIGN_CENTER_HORIZONTAL | wxEXPAND | wxFIXED_MINSIZE, 5);
 
-	//wxStaticLine* wxStaticLine2 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-	//flexGrid->Add(wxStaticLine2, 0, wxEXPAND | wxALL, 5);
-
-	//add the sizer to the frame and set it to lay itself out
-	this->SetSizer(flexGrid);
-	//slight fix to resize the grid properly as the window opens
-	this->SetSize(flexGrid->GetMinSize());
+	//thank you to doublema on the wxWidgets forums for the fix
+	this->SetSizerAndFit(flexGrid);
 	this->Layout();
 }
 
@@ -107,6 +105,7 @@ GameGrid::~GameGrid() {
 	delete[] mValues;
 	delete mRandomDistribution;
 	delete mRandomEngine;
+	delete mToggleButtonGrid;
 }
 
 #include <iostream>
