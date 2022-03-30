@@ -36,34 +36,20 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 	flexGrid->SetFlexibleDirection(wxBOTH);
 	flexGrid->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	//create as many buttons as are needed to populate the grid
-	mButtons = new wxToggleButton * [GRID_HEIGHT * GRID_WIDTH];
-	mValues = new wxChar[GRID_HEIGHT * GRID_WIDTH];
 
-	wxGridSizer* grid = new wxGridSizer(GRID_HEIGHT, GRID_WIDTH, 0, 0);
+	wxFont gridButtonFont(30, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+	mToggleButtonGrid = new ToggleButtonGrid(this, 10, 10, gridButtonFont);
 
-	wxFont aFont(30, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
-
-	//populate the grid with buttons, generate random letters for each, and bind their even methods
 	for (int i = 0; i < GRID_HEIGHT; i++) {
 		for (int j = 0; j < GRID_WIDTH; j++) {
-			mButtons[(i * GRID_WIDTH) + j] = new wxToggleButton(
-				this, 
-				10000 + (i * GRID_WIDTH) + j,
-				std::to_string(i) + ' ' + std::to_string(j));
-			mButtons[(i * GRID_WIDTH) + j]->SetFont(aFont);
-
-			grid->Add(mButtons[(i * GRID_WIDTH) + j], 1, wxEXPAND | wxALL);
-
-			mButtons[(i * GRID_WIDTH) + j]->Bind(wxEVT_TOGGLEBUTTON, &GameGrid::OnButtonClicked, this);
-
-			mValues[(i * GRID_WIDTH) + j] = randomLetter();
-
-			mButtons[(i * GRID_WIDTH) + j]->SetLabel(mValues[(i * GRID_WIDTH) + j]);
+			mToggleButtonGrid->getToggleButtonByIndex(i, j)->SetLabelText(randomLetter());
 		}
 	}
 
-	flexGrid->Add(grid, 1, wxEXPAND, 5);
+	using namespace std::placeholders;
+
+	mToggleButtonGrid->registerButtonEventListener(std::bind(&GameGrid::handleToggleButtonEvent, this, _1, _2, _3, _4));
+	flexGrid->Add(mToggleButtonGrid, 1, wxEXPAND, 5);
 
 	//all this holds the Ok and Cancel buttons
 	wxStdDialogButtonSizer* sdbSizer = new wxStdDialogButtonSizer();
@@ -76,27 +62,22 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 
 	flexGrid->Add(sdbSizer, 1, wxALIGN_CENTER, 5);
 
-	//wxStaticLine* wxStaticLine1 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-	//flexGrid->Add(wxStaticLine1, 0, wxEXPAND | wxALL, 5);
-
 	wxBoxSizer* scorePreviewBoxSizer;
 	scorePreviewBoxSizer = new wxBoxSizer(wxVERTICAL);
 
-	mScorePreview = new wxStaticText(this, wxID_ANY, wxT("MyLabel"), wxDefaultPosition, wxDefaultSize, 0);
+	mScorePreview = new wxStaticText(this, wxID_ANY, wxT("static_text_score_preview"), wxDefaultPosition, wxDefaultSize, 0);
 	mScorePreview->Wrap(-1);
+	
+	wxFont scorePreviewFont(15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	mScorePreview->SetLabel("Currently selected word score");
+	mScorePreview->SetFont(scorePreviewFont);
 	scorePreviewBoxSizer->Add(mScorePreview, 0, wxALL | wxALIGN_CENTER, 5);
 	scorePreviewBoxSizer->Layout();
 
 	flexGrid->Add(scorePreviewBoxSizer, 1, wxALIGN_CENTER_HORIZONTAL | wxEXPAND | wxFIXED_MINSIZE, 5);
 
-	//wxStaticLine* wxStaticLine2 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-	//flexGrid->Add(wxStaticLine2, 0, wxEXPAND | wxALL, 5);
-
-	//add the sizer to the frame and set it to lay itself out
-	this->SetSizer(flexGrid);
-	//slight fix to resize the grid properly as the window opens
-	this->SetSize(flexGrid->GetMinSize());
+	//thank you to doublema on the wxWidgets forums for the fix
+	this->SetSizerAndFit(flexGrid);
 	this->Layout();
 }
 
@@ -107,53 +88,14 @@ GameGrid::~GameGrid() {
 	delete[] mValues;
 	delete mRandomDistribution;
 	delete mRandomEngine;
+	delete mToggleButtonGrid;
 }
 
 #include <iostream>
 
-void GameGrid::OnButtonClicked(wxCommandEvent& evt) {
-	//get the grid position based on the id we set earlier
-	int x = (evt.GetId() - 10000) % GRID_WIDTH;
-	int y = (evt.GetId() - 10000) / GRID_WIDTH;
-
-	wxLogDebug("button %i %i was clicked", x, y);
-
-	if (mCurrentSelection.size() == 0) {
-		mCurrentSelection.push_back(std::pair<int, int>(x, y));
-		wxLogDebug("added as first selected");
-	}
-	else if (mCurrentSelection.size() > 0) {
-		auto lastClicked = mCurrentSelection.back();
-		if ((lastClicked.first == x) && (lastClicked.second == y)) {
-			mButtons[y * GRID_WIDTH + x]->SetValue(false);
-			wxLogDebug("removing last clicked");
-			mCurrentSelection.pop_back();
-			return;
-		}
-		if (mCurrentSelection.size() > 1) {
-			for (auto i = mCurrentSelection.begin(); i != std::prev(mCurrentSelection.end()); i++) {
-				if ((i->first == x) && (i->second == y)) {
-					mButtons[y * GRID_WIDTH + x]->SetValue(true);
-					wxLogDebug("resetting clicked that wasn't tail");
-					return;
-				}
-			}
-		}
-		if (isAdjacent(x, y, lastClicked.first, lastClicked.second)) {
-			wxLogDebug("adding adjacent");
-			mCurrentSelection.push_back(std::pair<int, int>(x, y));
-		}
-		else {
-			wxLogDebug("resetting clicked that wasn't adjacent");
-			mButtons[y * GRID_WIDTH + x]->SetValue(false);
-		}
-	}
-}
-
 void GameGrid::OnOkButtonClicked(wxCommandEvent& evt) {
 	bool isWord = mDictionary.isWord(getSelectedString());
 	int wordScore = getWordScore(getSelectedString());
-	wxLogDebug("ok button pressed");
 	wxLogDebug(getSelectedString());
 	wxLogDebug("%s", isWord ? " is a word" : " is not a word");
 	wxLogDebug("word score %i", wordScore);
@@ -168,6 +110,42 @@ void GameGrid::OnOkButtonClicked(wxCommandEvent& evt) {
 void GameGrid::OnCancelButtonClicked(wxCommandEvent& evt) {
 	wxLogDebug("cancel button pressed");
 	clearCurrentSelection();
+}
+
+bool GameGrid::handleToggleButtonEvent(wxCommandEvent& evt, int x, int y, wxToggleButton* button) {
+	wxLogDebug("button %i %i was clicked", x, y);
+
+	if (mCurrentSelection.size() == 0) {
+		mCurrentSelection.push_back(std::pair<int, int>(x, y));
+		wxLogDebug("added as first selected");
+	}
+	else if (mCurrentSelection.size() > 0) {
+		auto lastClicked = mCurrentSelection.back();
+		if ((lastClicked.first == x) && (lastClicked.second == y)) {
+			button->SetValue(false);
+			wxLogDebug("removing last clicked");
+			mCurrentSelection.pop_back();
+			return false;
+		}
+		if (mCurrentSelection.size() > 1) {
+			for (auto i = mCurrentSelection.begin(); i != std::prev(mCurrentSelection.end()); i++) {
+				if ((i->first == x) && (i->second == y)) {
+					mToggleButtonGrid->getToggleButtonByIndex(x, y)->SetValue(true);
+					wxLogDebug("resetting clicked that wasn't tail");
+					return false;
+				}
+			}
+		}
+		if (isAdjacent(x, y, lastClicked.first, lastClicked.second)) {
+			wxLogDebug("adding adjacent");
+			mCurrentSelection.push_back(std::pair<int, int>(x, y));
+		}
+		else {
+			wxLogDebug("resetting clicked that wasn't adjacent");
+			mToggleButtonGrid->getToggleButtonByIndex(x, y)->SetValue(false);
+		}
+	}
+	return false;
 }
 
 wxChar GameGrid::randomLetter() const {
@@ -190,21 +168,21 @@ bool GameGrid::isAdjacent(int x1, int y1, int x2, int y2) {
 void GameGrid::replaceCurrentSelection() {
 	for (auto i : mCurrentSelection) {
 		wxChar newChar = randomLetter();
-		mValues[i.second * GRID_WIDTH + i.first] = newChar;
-		mButtons[i.second * GRID_WIDTH + i.first]->SetLabel(newChar);
+		mToggleButtonGrid->getToggleButtonByIndex(i.first, i.second)->SetLabel(newChar);
 	}
 }
 
 wxString GameGrid::getSelectedString() const {
 	wxString str;
 	for (auto i : mCurrentSelection)
-		str.Append(mValues[i.second * GRID_WIDTH + i.first]);
+		//str.Append(mValues[i.second * GRID_WIDTH + i.first]);
+		str.Append(mToggleButtonGrid->getToggleButtonByIndex(i.first, i.second)->GetLabelText());
 	return str;
 }
 
 void GameGrid::clearCurrentSelection() {
 	for (auto i : mCurrentSelection)
-		mButtons[i.second * GRID_WIDTH + i.first]->SetValue(false);
+		mToggleButtonGrid->getToggleButtonByIndex(i.first, i.second)->SetValue(false);
 	mCurrentSelection.clear();
 }
 

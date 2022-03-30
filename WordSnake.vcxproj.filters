@@ -24,6 +24,9 @@
     <ClInclude Include="Dictionary.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ToggleButtonGrid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WordSnake.cpp">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Dictionary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToggleButtonGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

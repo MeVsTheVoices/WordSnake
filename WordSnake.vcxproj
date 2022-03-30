@@ -149,10 +149,12 @@
     <ClInclude Include="Dictionary.hpp" />
     <ClInclude Include="GameGrid.hpp" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="ToggleButtonGrid.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dictionary.cpp" />
     <ClCompile Include="GameGrid.cpp" />
+    <ClCompile Include="ToggleButtonGrid.cpp" />
     <ClCompile Include="WordSnake.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
