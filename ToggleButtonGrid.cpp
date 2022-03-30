@@ -36,19 +36,19 @@ ToggleButtonGrid::ToggleButtonGrid(
 }
 
 void ToggleButtonGrid::OnButtonClicked(wxCommandEvent& evt) {
-
+	handleButtonEvent(evt);
 }
 
 void ToggleButtonGrid::registerButtonEventListener(std::function<bool(wxCommandEvent&, int, int, wxToggleButton*)> listener) {
 	mButtonEventListenerList.push_back(listener);
 }
 
-void ToggleButtonGrid::removeButtonEventListener(std::function<bool(wxCommandEvent&, int, int, wxToggleButton*)> listener) {
-	mButtonEventListenerList.remove(listener);
-}
-
 void ToggleButtonGrid::clearButtonEventListeners() {
 	mButtonEventListenerList.clear();
+}
+
+wxToggleButton* ToggleButtonGrid::getToggleButtonByIndex(int x, int y) {
+	return mButtonsByIndex[x][y];
 }
 
 void ToggleButtonGrid::handleButtonEvent(wxCommandEvent& event) {

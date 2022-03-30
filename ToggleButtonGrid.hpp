@@ -21,8 +21,9 @@ public:
 	void OnButtonClicked(wxCommandEvent& evt);
 
 	void registerButtonEventListener(std::function<bool(wxCommandEvent&, int, int, wxToggleButton*)>);
-	void removeButtonEventListener(std::function<bool(wxCommandEvent&, int, int, wxToggleButton*)>);
 	void clearButtonEventListeners();
+
+	wxToggleButton* getToggleButtonByIndex(int x, int y);
 
 protected:
 

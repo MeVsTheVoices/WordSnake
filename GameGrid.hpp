@@ -28,6 +28,8 @@ public:
 	void OnOkButtonClicked(wxCommandEvent& evt);
 	void OnCancelButtonClicked(wxCommandEvent& evt);
 
+	bool handleToggleButtonEvent(wxCommandEvent& evt, int x, int y, wxToggleButton* button);
+
 private:
 	static const int mAlphabetCeil = 26;
 	const wxChar mAlphabet[mAlphabetCeil] {
