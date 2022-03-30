@@ -1,6 +1,6 @@
 #include "Dictionary.hpp"
 
-void Dictionary::initialize() {
+Dictionary::Dictionary() {
 	wxFileInputStream input(DICTIONARY_FILE_NAME);
 	wxTextInputStream text(input);
 	wxString line;
@@ -12,6 +12,16 @@ void Dictionary::initialize() {
 	}
 	int size = mDictionary.size();
 	wxLogDebug("current %i entries in dictionary", size);
+
+	mAlphabet = new EnglishAlphabet;
+}
+
+Dictionary::~Dictionary() {
+	delete mAlphabet;
+}
+
+int Dictionary::getWordScore(const wxString& str) const {
+	return mAlphabet->calculateScore(str);
 }
 
 bool Dictionary::isWord(wxString str) {

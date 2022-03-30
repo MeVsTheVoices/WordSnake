@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Alphabet.hpp" />
     <ClInclude Include="Dictionary.hpp" />
     <ClInclude Include="GameGrid.hpp" />
     <ClInclude Include="targetver.h" />

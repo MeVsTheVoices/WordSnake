@@ -18,9 +18,6 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 		mAlphabetDistributionVector.begin(), mAlphabetDistributionVector.end()
 	};
 
-	//go ahead and load up the dictionary from the file specified
-	mDictionary.initialize();
-
 	//currently the score of each letter is the inverse of how common it is
 	// TODO: change how scores are calculated, increases for longer words, normalize a little so that for example, z isn't worth 1000x an e
 	for (int i = 0; i < mAlphabetCeil; i++) {
@@ -95,7 +92,7 @@ GameGrid::~GameGrid() {
 
 void GameGrid::OnOkButtonClicked(wxCommandEvent& evt) {
 	bool isWord = mDictionary.isWord(getSelectedString());
-	int wordScore = getWordScore(getSelectedString());
+	int wordScore = mDictionary.getWordScore(getSelectedString());
 	wxLogDebug(getSelectedString());
 	wxLogDebug("%s", isWord ? " is a word" : " is not a word");
 	wxLogDebug("word score %i", wordScore);
@@ -186,13 +183,4 @@ void GameGrid::clearCurrentSelection() {
 	for (auto i : mCurrentSelection)
 		mToggleButtonGrid->getToggleButtonByIndex(i.first, i.second)->SetValue(false);
 	mCurrentSelection.clear();
-}
-
-int GameGrid::getWordScore(wxString str) {
-	int sum = 0;
-	for (int i = 0; i < str.length(); i++)
-		for (int j = 0; j < mAlphabetCeil; j++)
-			if (mAlphabet[j] == str[i])
-				sum += (mAlphabetScores[j] * (i + 1));
-	return sum;
 }
