@@ -155,6 +155,8 @@ wxChar GameGrid::randomLetter() const {
 }
 
 bool GameGrid::isAdjacent(int x1, int y1, int x2, int y2) {
+	//tests for adjacency, two tiles are adjacent if they are in either the same row or column
+	//and they are either +1 or -1 in whatever direction they aren't in the same as
 	wxLogDebug("(%i, %i), (%i, %i)", x1, y1, x2, y2);
 	if (x1 == x2)
 		if ((y1 == (y2 - 1)) || (y1 == (y2 + 1)))
@@ -166,6 +168,7 @@ bool GameGrid::isAdjacent(int x1, int y1, int x2, int y2) {
 }
 
 void GameGrid::replaceCurrentSelection() {
+	//replaces all tiles in current selection with new letter
 	for (auto i : mCurrentSelection) {
 		wxChar newChar = randomLetter();
 		mToggleButtonGrid->getToggleButtonByIndex(i.first, i.second)->SetLabel(newChar);
@@ -175,7 +178,6 @@ void GameGrid::replaceCurrentSelection() {
 wxString GameGrid::getSelectedString() const {
 	wxString str;
 	for (auto i : mCurrentSelection)
-		//str.Append(mValues[i.second * GRID_WIDTH + i.first]);
 		str.Append(mToggleButtonGrid->getToggleButtonByIndex(i.first, i.second)->GetLabelText());
 	return str;
 }
@@ -191,6 +193,6 @@ int GameGrid::getWordScore(wxString str) {
 	for (int i = 0; i < str.length(); i++)
 		for (int j = 0; j < mAlphabetCeil; j++)
 			if (mAlphabet[j] == str[i])
-				sum += mAlphabetScores[j];
+				sum += (mAlphabetScores[j] * (i + 1));
 	return sum;
 }
