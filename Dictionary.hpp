@@ -5,7 +5,7 @@
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
 
-#include "Alphabet.hpp"
+#include "EnglishAlphabet.hpp"
 
 class Dictionary {
 private:
@@ -18,5 +18,7 @@ public:
 	~Dictionary();
 	int getWordScore(const wxString& str) const;
 	bool isWord(wxString str);
+	wxString getWordScoreBreakdown(const wxString& word) const;
+	wxUniChar getRandomLetter();
 };
 

@@ -148,11 +148,13 @@
   <ItemGroup>
     <ClInclude Include="Alphabet.hpp" />
     <ClInclude Include="Dictionary.hpp" />
+    <ClInclude Include="EnglishAlphabet.hpp" />
     <ClInclude Include="GameGrid.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ToggleButtonGrid.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Alphabet.cpp" />
     <ClCompile Include="Dictionary.cpp" />
     <ClCompile Include="GameGrid.cpp" />
     <ClCompile Include="ToggleButtonGrid.cpp" />

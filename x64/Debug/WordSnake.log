@@ -1,7 +1,4 @@
-﻿  Dictionary.cpp
-  GameGrid.cpp
-  WordSnake.cpp
-  Generating Code...
+﻿  GameGrid.cpp
   WordSnake.vcxproj -> C:\Users\Feast\source\repos\WordSnake\x64\Debug\WordSnake.exe
   ALLUSERSPROFILE=C:\ProgramData
   APPDATA=C:\Users\Feast\AppData\Roaming
@@ -49,7 +46,7 @@
   PROMPT=$P$G
   PSModulePath=C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
   PUBLIC=C:\Users\Public
-  ServiceHubLogSessionKey=5B7793B7
+  ServiceHubLogSessionKey=70340577
   SESSIONNAME=Console
   SignInWithHomeTenantOnly=False
   SystemDrive=C:
@@ -69,9 +66,9 @@
   VSLANG=1033
   VSLS_SESSION_KEEPALIVE_INTERVAL=0
   VSSKUEDITION=Community
-  VSTEL_CurrentSolutionBuildID=3654447253
+  VSTEL_CurrentSolutionBuildID=3780391023
   VSTEL_ProjectID={530b976c-4874-4524-817c-129d7a0f3654}
-  VSTEL_SolutionSessionID={E81DD15E-6214-4C92-9F24-610F4CCF4AFE}
+  VSTEL_SolutionSessionID={42CAC966-DDC6-41B9-AB5F-C0303AC1AAF7}
   windir=C:\Windows
   wxwin=C:\Users\Feast\wxWidgets-3.1.5
   _MSYS2_BASH=C:\tools\msys64\usr\bin\bash.exe
