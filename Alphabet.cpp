@@ -39,8 +39,9 @@ void Alphabet::calculateLetterScores() {
 		letterScore = alphabetDistribution[i];
 		letterScore = 1 / letterScore;
 		letterScore *= 1000.0f;
+		letterScore += 5;
 		alphabetScores[alphabet[i]] = static_cast<int>(letterScore);
 	}
-	HAVE_SCORES_BEEN_CALCULATED = true;
 	this->setAlphabetScores(alphabetScores);
+	HAVE_SCORES_BEEN_CALCULATED = true;
 }

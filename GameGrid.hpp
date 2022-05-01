@@ -42,9 +42,13 @@ private:
 	void clearCurrentSelection();
 
 	int getWordScore(wxString);
-	Dictionary mDictionary;
+	void setGauges();
+	void setGauge(wxGauge* gauge, int value);
 
-	wxStaticText* mScorePreview;
+	Dictionary mDictionary;
+	const int mScoreGaugeMax = 10000;
+	wxGauge* mWordScoreGauge;
+	wxGauge* mTotalScoreGauge;
 
 	ToggleButtonGrid* mToggleButtonGrid;
 };
