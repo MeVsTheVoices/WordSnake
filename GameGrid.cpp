@@ -3,33 +3,21 @@
 #include <vector>
 
 GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
-	//the next few lines create a way of generating random characters based
-	//on the distribution of words in the language
-	mRandomEngine = new std::default_random_engine(std::random_device{}());
-
-	//setup for the alphabet and the generation of random letters
-	std::vector<int> mAlphabetDistributionVector;
-	std::copy(
-		std::begin(mAlphabetDistribution),
-		std::end(mAlphabetDistribution),
-		std::back_inserter(mAlphabetDistributionVector));
-
-	mRandomDistribution = new std::discrete_distribution<int> { 
-		mAlphabetDistributionVector.begin(), mAlphabetDistributionVector.end()
-	};
-
-	//go ahead and load up the dictionary from the file specified
-	mDictionary.initialize();
-
-	//currently the score of each letter is the inverse of how common it is
-	// TODO: change how scores are calculated, increases for longer words, normalize a little so that for example, z isn't worth 1000x an e
-	for (int i = 0; i < mAlphabetCeil; i++) {
-		mAlphabetScores[i] = 
-			static_cast<int>(
-				(1.0f/static_cast<float>(mAlphabetDistribution[i]) * 1000.0f));
-	}
-
 	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
+
+	//create and populate the menu bar
+	auto menuBar = new wxMenuBar(0);
+	menuBar->SetLabel("Game");
+	auto menuOne = new wxMenu();
+	menuOne->Bind(wxEVT_COMMAND_MENU_SELECTED, [=](wxCommandEvent& ev) {
+		mCurrentScore = 0;
+		clearCurrentSelection();
+		setGauges();
+	});
+	auto menuOneItemOne = new wxMenuItem(menuOne, wxID_NEW, wxString(wxT("New game")), wxEmptyString, wxITEM_NORMAL);
+	menuOne->Append(menuOneItemOne);
+	menuBar->Append(menuOne, wxT("Game menu"));
+	this->SetMenuBar(menuBar);
 
 	// TODO: tidy all this garbage up, maybe subclass, or create a factory for button classes
 	wxFlexGridSizer* flexGrid = new wxFlexGridSizer(0, 1, 0, 0);
@@ -42,7 +30,7 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 
 	for (int i = 0; i < GRID_HEIGHT; i++) {
 		for (int j = 0; j < GRID_WIDTH; j++) {
-			mToggleButtonGrid->getToggleButtonByIndex(i, j)->SetLabelText(randomLetter());
+			mToggleButtonGrid->getToggleButtonByIndex(i, j)->SetLabelText(mDictionary.getRandomLetter());
 		}
 	}
 
@@ -52,29 +40,38 @@ GameGrid::GameGrid() : wxFrame(nullptr, wxID_ANY, "WordSnake") {
 	flexGrid->Add(mToggleButtonGrid, 1, wxEXPAND, 5);
 
 	//all this holds the Ok and Cancel buttons
+	wxFont sdbSizerFont(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_MAX, wxFONTWEIGHT_LIGHT);
 	wxStdDialogButtonSizer* sdbSizer = new wxStdDialogButtonSizer();
 	sdbSizer->AddButton(new wxButton(this, wxID_OK));
+	sdbSizer->GetAffirmativeButton()->SetLabelText("Submit word");
 	sdbSizer->GetAffirmativeButton()->Bind(wxEVT_BUTTON, &GameGrid::OnOkButtonClicked, this);
+	sdbSizer->GetAffirmativeButton()->SetFont(sdbSizerFont);
+	sdbSizer->GetAffirmativeButton()->SetDefault();
+
 	sdbSizer->AddButton(new wxButton(this, wxID_CANCEL));
+	sdbSizer->GetCancelButton()->SetLabelText("Clear selection");
 	sdbSizer->GetCancelButton()->Bind(wxEVT_BUTTON, &GameGrid::OnCancelButtonClicked, this);
+	sdbSizer->GetCancelButton()->SetFont(sdbSizerFont);
+
 	sdbSizer->SetMinSize(wxSize(100, 100));
 	sdbSizer->Realize();
-
 	flexGrid->Add(sdbSizer, 1, wxALIGN_CENTER, 5);
 
-	wxBoxSizer* scorePreviewBoxSizer;
-	scorePreviewBoxSizer = new wxBoxSizer(wxVERTICAL);
+	auto scoreSizer = new wxFlexGridSizer(1, 5, 5);
+	scoreSizer->SetFlexibleDirection(wxBOTH);
 
-	mScorePreview = new wxStaticText(this, wxID_ANY, wxT("static_text_score_preview"), wxDefaultPosition, wxDefaultSize, 0);
-	mScorePreview->Wrap(-1);
-	
-	wxFont scorePreviewFont(15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	mScorePreview->SetLabel("Currently selected word score");
-	mScorePreview->SetFont(scorePreviewFont);
-	scorePreviewBoxSizer->Add(mScorePreview, 0, wxALL | wxALIGN_CENTER, 5);
-	scorePreviewBoxSizer->Layout();
+	//create the two gauges that reside on the bottom, one for the current score of the words, one for the players score total
+	mTotalScoreGauge = new wxGauge(this, wxID_ANY, mScoreGaugeMax);
+	mWordScoreGauge = new wxGauge(this, wxID_ANY, mScoreGaugeMax);
+	mTotalScoreGauge->SetValue(0);
+	mTotalScoreGauge->SetLabel("Game score");
+	mWordScoreGauge->SetValue(0);
+	mTotalScoreGauge->SetLabel("Word score");
+	scoreSizer->Add(mTotalScoreGauge);
+	scoreSizer->Add(mWordScoreGauge);
+	scoreSizer->Layout();
 
-	flexGrid->Add(scorePreviewBoxSizer, 1, wxALIGN_CENTER_HORIZONTAL | wxEXPAND | wxFIXED_MINSIZE, 5);
+	flexGrid->Add(scoreSizer, 1, wxEXPAND | wxALL | wxALIGN_CENTRE_HORIZONTAL, 5);
 
 	//thank you to doublema on the wxWidgets forums for the fix
 	this->SetSizerAndFit(flexGrid);
@@ -86,8 +83,6 @@ GameGrid::~GameGrid() {
 	//clean up
 	delete[] mButtons;
 	delete[] mValues;
-	delete mRandomDistribution;
-	delete mRandomEngine;
 	delete mToggleButtonGrid;
 }
 
@@ -95,7 +90,7 @@ GameGrid::~GameGrid() {
 
 void GameGrid::OnOkButtonClicked(wxCommandEvent& evt) {
 	bool isWord = mDictionary.isWord(getSelectedString());
-	int wordScore = getWordScore(getSelectedString());
+	int wordScore = mDictionary.getWordScore(getSelectedString());
 	wxLogDebug(getSelectedString());
 	wxLogDebug("%s", isWord ? " is a word" : " is not a word");
 	wxLogDebug("word score %i", wordScore);
@@ -105,28 +100,35 @@ void GameGrid::OnOkButtonClicked(wxCommandEvent& evt) {
 		mCurrentScore += wordScore;
 		wxLogDebug("current score now %i", mCurrentScore);
 	}
+	setGauges();
 }
 
 void GameGrid::OnCancelButtonClicked(wxCommandEvent& evt) {
 	wxLogDebug("cancel button pressed");
 	clearCurrentSelection();
+	setGauges();
 }
 
 bool GameGrid::handleToggleButtonEvent(wxCommandEvent& evt, int x, int y, wxToggleButton* button) {
 	wxLogDebug("button %i %i was clicked", x, y);
 
+	//if we're the first button to be clicked on since there having been none selected
 	if (mCurrentSelection.size() == 0) {
 		mCurrentSelection.push_back(std::pair<int, int>(x, y));
 		wxLogDebug("added as first selected");
 	}
+	//if we're not the first button in the sequence to be clicked
 	else if (mCurrentSelection.size() > 0) {
 		auto lastClicked = mCurrentSelection.back();
+		//if we were the last button in the sequence to be clicked
 		if ((lastClicked.first == x) && (lastClicked.second == y)) {
 			button->SetValue(false);
 			wxLogDebug("removing last clicked");
 			mCurrentSelection.pop_back();
+			setGauges();
 			return false;
 		}
+		//if we were not the tail of the sequence
 		if (mCurrentSelection.size() > 1) {
 			for (auto i = mCurrentSelection.begin(); i != std::prev(mCurrentSelection.end()); i++) {
 				if ((i->first == x) && (i->second == y)) {
@@ -136,9 +138,11 @@ bool GameGrid::handleToggleButtonEvent(wxCommandEvent& evt, int x, int y, wxTogg
 				}
 			}
 		}
+		//if we weren't in the sequence, check if we're adjacted to the tail
 		if (isAdjacent(x, y, lastClicked.first, lastClicked.second)) {
 			wxLogDebug("adding adjacent");
 			mCurrentSelection.push_back(std::pair<int, int>(x, y));
+			setGauges();
 		}
 		else {
 			wxLogDebug("resetting clicked that wasn't adjacent");
@@ -146,12 +150,6 @@ bool GameGrid::handleToggleButtonEvent(wxCommandEvent& evt, int x, int y, wxTogg
 		}
 	}
 	return false;
-}
-
-wxChar GameGrid::randomLetter() const {
-	//return a random character in the alphabet, frequency distribution is based on the occurance
-	//of those letters within words within the language
-	return mAlphabet[mRandomDistribution->operator()(*mRandomEngine)];
 }
 
 bool GameGrid::isAdjacent(int x1, int y1, int x2, int y2) {
@@ -170,7 +168,7 @@ bool GameGrid::isAdjacent(int x1, int y1, int x2, int y2) {
 void GameGrid::replaceCurrentSelection() {
 	//replaces all tiles in current selection with new letter
 	for (auto i : mCurrentSelection) {
-		wxChar newChar = randomLetter();
+		wxUniChar newChar = mDictionary.getRandomLetter();
 		mToggleButtonGrid->getToggleButtonByIndex(i.first, i.second)->SetLabel(newChar);
 	}
 }
@@ -189,10 +187,24 @@ void GameGrid::clearCurrentSelection() {
 }
 
 int GameGrid::getWordScore(wxString str) {
-	int sum = 0;
-	for (int i = 0; i < str.length(); i++)
-		for (int j = 0; j < mAlphabetCeil; j++)
-			if (mAlphabet[j] == str[i])
-				sum += (mAlphabetScores[j] * (i + 1));
-	return sum;
+	return mDictionary.getWordScore(str);
+}
+
+void GameGrid::setGauges() {
+	static const int wordsInGame = 10;
+	int wordScore = getWordScore(getSelectedString());
+	setGauge(mWordScoreGauge, wordScore);
+	setGauge(mTotalScoreGauge, mCurrentScore/wordsInGame);
+}
+
+#include <cmath>
+
+void GameGrid::setGauge(wxGauge* gauge, int value) {
+	static const auto xTermCoef = 0.08f;
+	static const auto xTermBias = 5.5f;
+
+	float eTerm = exp((-xTermCoef * value) + xTermBias);
+	float bottomTerm = 1 + eTerm;
+	float topTerm = gauge->GetRange();
+	gauge->SetValue(static_cast<int>(topTerm / bottomTerm));
 }

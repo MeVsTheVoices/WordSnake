@@ -1,4 +1,5 @@
-﻿  WordSnake.vcxproj -> C:\Users\Feast\source\repos\WordSnake\x64\Debug\WordSnake.exe
+﻿  GameGrid.cpp
+  WordSnake.vcxproj -> C:\Users\Feast\source\repos\WordSnake\x64\Debug\WordSnake.exe
   ALLUSERSPROFILE=C:\ProgramData
   APPDATA=C:\Users\Feast\AppData\Roaming
   CAExcludePath=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\atlmfc\include;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include;C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt;;C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um;C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared;C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\winrt;C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\cppwinrt;Include\um;
@@ -30,7 +31,7 @@
   OculusBase=C:\Program Files\Oculus\
   OneDrive=C:\Users\Feast\OneDrive
   OS=Windows_NT
-  Path=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x86;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86;;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\tools;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide;C:\Program Files (x86)\HTML Help Workshop;;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin;C:\Windows\Microsoft.NET\Framework\v4.0.30319\;;C:\Program Files\Oculus\Support\oculus-runtime;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\ProgramData\chocolatey\bin;C:\Program Files\CMake\bin;C:\MinGW\mingw32\bin;C:\Program Files\Go\bin;C:\Program Files\Git LFS;C:\Program Files\Git\cmd;C:\Users\Feast\AppData\Local\Microsoft\WindowsApps;C:\Users\Feast\AppData\Roaming\cabal\bin;C:\tools\ghc-9.2.1\bin;C:\tools\msys64;C:\Users\Feast\AppData\Local\GitHubDesktop\bin;C:\MinGW\bin;C:\Users\Feast\wxWidgets-3.1.5\lib\vc142_x64_dll;;C:\Users\Feast\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Feast\go\bin;
+  Path=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x86;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86;;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\tools;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide;C:\Program Files (x86)\HTML Help Workshop;;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin;C:\Windows\Microsoft.NET\Framework\v4.0.30319\;;C:\Program Files\Oculus\Support\oculus-runtime;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\ProgramData\chocolatey\bin;C:\Program Files\CMake\bin;C:\MinGW\mingw32\bin;C:\Program Files\Git LFS;C:\Program Files\Git\cmd;C:\Program Files\Go\bin;C:\Users\Feast\AppData\Local\Microsoft\WindowsApps;C:\Users\Feast\AppData\Roaming\cabal\bin;C:\tools\ghc-9.2.1\bin;C:\tools\msys64;C:\Users\Feast\AppData\Local\GitHubDesktop\bin;C:\MinGW\bin;C:\Users\Feast\wxWidgets-3.1.5\lib\vc142_x64_dll;;C:\Users\Feast\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Feast\go\bin;
   PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
   PkgDefApplicationConfigFile=C:\Users\Feast\AppData\Local\Microsoft\VisualStudio\16.0_15f59de1\devenv.exe.config
   PROCESSOR_ARCHITECTURE=x86
@@ -45,7 +46,7 @@
   PROMPT=$P$G
   PSModulePath=C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
   PUBLIC=C:\Users\Public
-  ServiceHubLogSessionKey=43C3DDF5
+  ServiceHubLogSessionKey=6C8E7177
   SESSIONNAME=Console
   SignInWithHomeTenantOnly=False
   SystemDrive=C:
@@ -65,9 +66,9 @@
   VSLANG=1033
   VSLS_SESSION_KEEPALIVE_INTERVAL=0
   VSSKUEDITION=Community
-  VSTEL_CurrentSolutionBuildID=3637809329
+  VSTEL_CurrentSolutionBuildID=2025423937
   VSTEL_ProjectID={530b976c-4874-4524-817c-129d7a0f3654}
-  VSTEL_SolutionSessionID={42CE8AC7-C134-4990-B8CD-05D189D861FA}
+  VSTEL_SolutionSessionID={23149CAB-D833-41CF-A5ED-8817CD6BFFC5}
   windir=C:\Windows
   wxwin=C:\Users\Feast\wxWidgets-3.1.5
   _MSYS2_BASH=C:\tools\msys64\usr\bin\bash.exe

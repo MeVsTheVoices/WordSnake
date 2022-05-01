@@ -31,30 +31,8 @@ public:
 	bool handleToggleButtonEvent(wxCommandEvent& evt, int x, int y, wxToggleButton* button);
 
 private:
-	static const int mAlphabetCeil = 26;
-	const wxChar mAlphabet[mAlphabetCeil] {
-		'A', 'B', 'C', 'D', 'E',
-		'F', 'G', 'H', 'I', 'J',
-		'K', 'L', 'M', 'N', 'O',
-		'P', 'Q', 'R', 'S', 'T',
-		'U', 'V', 'W', 'X', 'Y',
-		'Z'
-	};
-	const int mAlphabetDistribution[mAlphabetCeil]{
-		820, 150, 270, 470, 1300,
-		220, 20,  620, 690, 14,
-		78,  410, 270, 670, 780,
-		190, 11,  590, 620, 960,
-		270, 97,  240, 15,  200,
-		8
-	};
-	int mAlphabetScores[mAlphabetCeil];
 
 	int mCurrentScore = 0;
-
-	std::default_random_engine* mRandomEngine;
-	std::discrete_distribution<int>* mRandomDistribution;
-	wxChar randomLetter() const;
 
 	std::list<std::pair<int, int> > mCurrentSelection;
 	static bool isAdjacent(int, int, int, int);
@@ -64,9 +42,13 @@ private:
 	void clearCurrentSelection();
 
 	int getWordScore(wxString);
-	Dictionary mDictionary;
+	void setGauges();
+	void setGauge(wxGauge* gauge, int value);
 
-	wxStaticText* mScorePreview;
+	Dictionary mDictionary;
+	const int mScoreGaugeMax = 10000;
+	wxGauge* mWordScoreGauge;
+	wxGauge* mTotalScoreGauge;
 
 	ToggleButtonGrid* mToggleButtonGrid;
 };
